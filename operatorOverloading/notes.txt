@@ -1,0 +1,133 @@
+OPERATOR OVERLOADING IN C++
+============================
+
+1. INTRODUCTION
+   - Operator overloading allows custom behavior for operators on user-defined types
+   - Makes objects behave like built-in types
+   - Improves code readability and intuitiveness
+
+2. RULES FOR OPERATOR OVERLOADING
+   - Cannot overload: :: (scope), . (member), .* (member pointer), ?: (ternary)
+   - Must have at least one operand of user-defined type
+   - Cannot change operator precedence or associativity
+   - Cannot change number of operands
+   - Default meaning for built-in types cannot be changed
+   - Some operators can only be overloaded as member functions: =, (), [], ->
+
+3. TWO WAYS TO OVERLOAD OPERATORS
+
+   A. MEMBER FUNCTION OVERLOADING
+      Syntax: ReturnType operator@(parameters) { ... }
+      - Left operand is implicit (*this)
+      - Used for: =, +=, -=, ++, --, [], (), ->, etc.
+      Example:
+        Complex operator+(const Complex& c) {
+          return Complex(real + c.real, imag + c.imag);
+        }
+
+   B. NON-MEMBER FUNCTION (FRIEND) OVERLOADING
+      Syntax: ReturnType operator@(Type1 obj1, Type2 obj2) { ... }
+      - Both operands are explicit parameters
+      - Used for: +, -, *, /, ==, <, etc.
+      Example:
+        friend Complex operator+(const Complex& c1, const Complex& c2) {
+          return Complex(c1.real + c2.real, c1.imag + c2.imag);
+        }
+
+4. COMMON OPERATORS TO OVERLOAD
+
+   A. ARITHMETIC OPERATORS: +, -, *, /, %
+      class Complex {
+      public:
+        Complex operator+(const Complex& c);
+        Complex operator-(const Complex& c);
+        Complex operator*(const Complex& c);
+        Complex operator/(const Complex& c);
+      };
+
+   B. COMPARISON OPERATORS: ==, !=, <, >, <=, >=
+      bool operator==(const Complex& c) const;
+      bool operator<(const Complex& c) const;
+
+   C. ASSIGNMENT OPERATOR: =
+      Complex& operator=(const Complex& c) {
+        if (this != &c) {
+          real = c.real;
+          imag = c.imag;
+        }
+        return *this;
+      }
+
+   D. UNARY OPERATORS: ++, --, !, -
+      - Prefix: ++obj, --obj (member function)
+      - Postfix: obj++, obj-- (member function with int dummy parameter)
+      Example:
+        Complex& operator++() { real++; return *this; }           // Prefix
+        Complex operator++(int) { Complex tmp(*this); real++; return tmp; } // Postfix
+
+   E. STREAM OPERATORS: <<, >>
+      - Must be friend functions (non-member)
+      friend std::ostream& operator<<(std::ostream& os, const Complex& c) {
+        os << c.real << " + " << c.imag << "i";
+        return os;
+      }
+
+   F. SUBSCRIPT OPERATOR: []
+      - Must be member function
+      double& operator[](int index) {
+        return (index == 0) ? real : imag;
+      }
+
+   G. FUNCTION CALL OPERATOR: ()
+      - Must be member function
+      - Makes object callable like a function
+      bool operator()(int x) { return x > 10; }
+
+   H. MEMBER ACCESS OPERATOR: ->
+      - Must be member function
+      Type* operator->() { return ptr; }
+
+   I. DEREFERENCE OPERATOR: *
+      - Usually member function
+      Type& operator*() { return *ptr; }
+
+5. BEST PRACTICES
+   - Use const correctness: const for parameters that shouldn't change
+   - Return by reference for assignment and compound operators: &
+   - Return by value for arithmetic operators
+   - Make comparison operators const
+   - Use compound assignment operators (+=, -=, etc.) for efficiency
+   - Implement operator= with self-assignment check
+   - For operator++/-- prefer prefix (more efficient, returns reference)
+   - Keep logic simple and intuitive
+
+6. IMPORTANT NOTES
+   - Assignment operator should return reference to *this
+   - Stream operators return reference to stream
+   - Copy constructor and copy assignment operator may need deep copy
+   - Comparison operators should be consistent (a < b implies !(b < a))
+   - Some operators are rarely overloaded: comma, address-of (&), etc.
+
+7. EXAMPLE: COMPLETE CLASS WITH OPERATOR OVERLOADING
+   class Vector {
+   private:
+     double x, y;
+   public:
+     Vector(double x = 0, double y = 0) : x(x), y(y) {}
+     
+     Vector operator+(const Vector& v) const { return Vector(x + v.x, y + v.y); }
+     Vector operator-(const Vector& v) const { return Vector(x - v.x, y - v.y); }
+     double operator*(const Vector& v) const { return x*v.x + y*v.y; } // Dot product
+     
+     Vector& operator+=(const Vector& v) { x += v.x; y += v.y; return *this; }
+     
+     bool operator==(const Vector& v) const { return x == v.x && y == v.y; }
+     bool operator!=(const Vector& v) const { return !(*this == v); }
+     
+     Vector& operator++() { x++; y++; return *this; }
+     
+     friend std::ostream& operator<<(std::ostream& os, const Vector& v) {
+       os << "(" << v.x << ", " << v.y << ")";
+       return os;
+     }
+   };

@@ -1,0 +1,38 @@
+C++ Type Casting Notes
+----------------------
+
+1) static_cast<T>(expr)
+	- Compile-time cast. Safe for conversions between related types (e.g., numeric types,
+	  pointer upcasts/downcasts in class hierarchies when you know the actual type).
+	- Does NOT perform runtime checks.
+	- Preferred over C-style cast when conversion is well-defined.
+
+2) dynamic_cast<T>(expr)
+	- Runtime-checked cast for polymorphic types (requires at least one virtual function).
+	- Safely downcasts pointers/references within an inheritance hierarchy.
+	- Returns nullptr for pointer casts on failure; throws std::bad_cast for reference casts on failure.
+
+3) const_cast<T>(expr)
+	- Used to add or remove const/volatile qualifiers.
+	- Only safe if the original object was not originally defined as const.
+
+4) reinterpret_cast<T>(expr)
+	- Low-level cast that reinterprets the bit pattern.
+	- Implementation-defined and non-portable; use sparingly (e.g., interfacing with hardware or legacy code).
+
+5) C-style cast: (T)expr or T(expr)
+	- Attempts const_cast, static_cast, and reinterpret_cast (in that order).
+	- Less explicit and potentially unsafe; avoid in modern C++.
+
+Guidelines:
+ - Prefer the C++ named casts for clarity and safety.
+ - Use dynamic_cast only when RTTI is available and you need runtime checking.
+ - Avoid reinterpret_cast unless absolutely necessary.
+ - Minimize cast usage; design APIs to reduce need for casting.
+
+Examples:
+ - int x = static_cast<int>(3.14);
+ - Base* b = dynamic_cast<Base*>(derivedPtr);
+ - char* p = reinterpret_cast<char*>(ptr);
+ - int* q = const_cast<int*>(constIntPtr);
+
