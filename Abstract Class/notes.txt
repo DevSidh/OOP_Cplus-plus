@@ -1,0 +1,61 @@
+C++ Abstract Class Notes
+
+1. What is an abstract class?
+- An abstract class is a class that cannot be instantiated directly.
+- It usually contains one or more pure virtual functions.
+- Abstract classes define an interface for derived classes.
+
+2. Pure virtual function
+- Syntax: virtual returnType functionName(parameterList) = 0;
+- Example: virtual void draw() = 0;
+- A pure virtual function has no implementation in the abstract class.
+- If a class has at least one pure virtual function, it becomes abstract.
+
+3. Why use abstract classes?
+- To force derived classes to provide specific behavior.
+- To model a general concept with different specialized implementations.
+- To support polymorphism through pointers or references to base class.
+
+4. Key rules
+- You cannot create objects of an abstract class.
+- A derived class must override all pure virtual functions to become concrete.
+- If a derived class does not override all pure virtual functions, it remains abstract.
+- Abstract classes can still have normal member functions and data members.
+- Abstract classes can have constructors and destructors.
+
+5. Example
+class Shape {
+public:
+    virtual void draw() = 0;    // pure virtual function
+    virtual ~Shape() {}         // virtual destructor
+};
+
+class Circle : public Shape {
+public:
+    void draw() override {
+        // draw circle code
+    }
+};
+
+int main() {
+    Shape* s = new Circle();
+    s->draw();
+    delete s;
+    return 0;
+}
+
+6. Notes
+- Use override in derived classes to avoid mistakes.
+- Always provide a virtual destructor in base classes when deleting derived objects through a base pointer.
+- Abstract classes are useful for defining plugins, interfaces, and base behaviors.
+
+7. Practical example
+- Abstract class: Animal with pure virtual function sound().
+- Derived classes: Dog and Cat implement sound().
+- Code can use Animal* to handle any animal type.
+
+8. Summary
+- Abstract class = class with pure virtual function(s).
+- Cannot instantiate directly.
+- Derived classes must implement all pure virtual functions.
+- Great for clean design and polymorphism.
