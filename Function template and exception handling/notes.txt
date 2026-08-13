@@ -5,6 +5,8 @@
 1. FUNCTION TEMPLATES
 ===============================================================================
 
+
+
 1.1 BASIC FUNCTION TEMPLATES
 ----------------------------
 Function templates allow you to write generic functions that work with any data type.
@@ -47,6 +49,75 @@ Example:
 1.3 DEFAULT TEMPLATE ARGUMENTS
 -------------------------------
 You can provide default types for template parameters.
+
+1.4 ALLOW ALL (VARIADIC AND GENERIC LAMBDA / TEMPLATE TECHNIQUES)
+-----------------------------------------------------------------
+To "allow all" types or an arbitrary number of arguments, use variadic templates
+or generic lambdas (C++14+). These let functions accept any number and mix of
+types.
+
+Example (variadic template):
+        template<typename... Args>
+        void log_all(Args&&... args) {
+                (std::cout << ... << args) << std::endl; // fold-expression (C++17)
+        }
+
+Example (generic lambda):
+        auto sum = [](auto... values) {
+                return (values + ...); // works for types that support +
+        };
+
+1.5 DIFF BETWEEN auto AND template
+----------------------------------
+Both 'auto' (especially in C++14+ generic lambdas and auto function parameters in C++20) and templates provide type-generic code, but they differ in intent, syntax and capabilities:
+
+- Declaration style:
+    - template: write a template header: template<typename T> ...
+    - auto: use 'auto' for type deduction (variables, return type, or generic lambda parameters)
+
+- Use cases:
+    - template: for generic functions, classes, and full control over template parameters (multiple parameters, defaults, specialization).
+    - auto: lightweight deduction for variables, return types, and concise generic lambdas.
+
+- Syntax example:
+    template<typename T>
+    T add_t(T a, T b) { return a + b; }
+
+    auto add_a = [](auto a, auto b) { return a + b; };
+
+- Differences:
+    - Templates can be specialized/overloaded and have explicit template parameters; auto-deduced parameters cannot be explicitly specified.
+    - Templates support non-type and template template parameters; auto does not.
+    - Templates are available in older standards; generic 'auto' parameters require C++14/20 features.
+    - Error messages: template instantiation errors often point into template code; auto-deduction in lambdas can be simpler to read.
+
+- When to prefer which:
+    - Use templates when you need full generic programming features, specializations, or library interfaces.
+    - Use auto/generic lambdas when you want concise, local generic behaviors or simpler type deduction.
+
+Short example showing both together:
+    template<typename T>
+    T multiply(T a, T b) { return a * b; }
+
+    auto multiply_generic = [](auto a, auto b) { return a * b; };
+
+Both can be used similarly, but templates offer more extensibility.
+
+Notes:
+        - Use perfect forwarding (Args&&) when forwarding values to preserve rvalue/lvalue.
+        - Variadic templates can be combined with type traits to constrain allowed types.
+
+1.5 DIFFERENCES (FUNCTION TEMPLATES VS OVERLOADING VS MACROS)
+------------------------------------------------------------
+- Function templates generate type-safe functions at compile time; macros perform
+    blind textual substitution (no type checking).
+- Templates support type deduction, specialization, and SFINAE/constraints; macros
+    do not.
+- Function overloading chooses the best-matching function among candidates;
+    templates participate in overload resolution and can provide generic fallbacks.
+- Prefer templates for generic code; use macros only for conditional compilation or
+    simple constants/guards.
+
 
 Example:
     template <typename T = int>
@@ -121,6 +192,42 @@ Example:
         print_args(1, 2, 3, 4, 5);  // Output: 1 2 3 4 5
         return 0;
     }
+
+1.7 MAIN DIFFERENCES: AUTO vs TEMPLATE
+---------------------------------------
+AUTO (Type Deduction):
+  - Deduces type at compile-time from the initializer
+  - Only for variables, not for functions
+  - Fixed type once deduced (no generalization)
+  - Narrower scope of use
+  - Type is determined by single initialization
+
+TEMPLATE (Generic Functions/Classes):
+  - Deduces type at compile-time during instantiation
+  - Can be used for functions, classes, and variables
+  - Creates generic code that works with multiple types
+  - Broader scope - can be called with different types
+  - Creates separate code for each type used (code bloat potential)
+
+Example Comparison:
+    // Using auto - type fixed at compile-time
+    auto x = 5;         // x is int
+    auto y = 3.14;      // y is double
+    // x cannot be used with different types later
+    
+    // Using template - generic across types
+    template <typename T>
+    T max_value(T a, T b) {
+        return (a > b) ? a : b;
+    }
+    
+    max_value(5, 10);        // Works with int
+    max_value(3.14, 2.71);   // Works with double
+    max_value("a", "b");     // Works with string
+    
+Key Difference:
+  - auto: one variable, one type
+  - template: one function/class, many types
 
 ===============================================================================
 2. EXCEPTION HANDLING
