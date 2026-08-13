@@ -1,14 +1,16 @@
 #include<iostream>
+#include<string>
 using namespace std;
 
-template <class T>
-void sum(T a, T b){
-    cout << a + b << endl;
+template <class T1,class T2>
+void display(T1 a,T2 b){
+    cout<<a<<endl;
+    cout<<b<<endl;
 }
 
 int main(){
-    sum<double>(1, 3.4);
-    sum(1, 4);
-    sum(string("HI"), string(" hello"));
+    display(1.0f, 3.4f);
+    display(1, 4);
+    display(string("HI"), 2);
     return 0;
 }
